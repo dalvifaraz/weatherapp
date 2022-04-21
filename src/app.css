@@ -1,0 +1,91 @@
+.weatherapp__container, .card{
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+
+ .card, .weatherapp__container > div{
+  background: var(--color-bg-variant);
+  padding: 2.5rem 5rem;
+  border-radius: 2rem;
+  border: 1px solid transparent;
+  transition: var(--transition);
+}
+
+.card, .weatherapp__container > div h3{
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-primary);
+}
+
+.card{
+  margin-top: 1rem;
+  background: var(--color-primary-variant);
+}
+
+.card:hover{
+  background: transparent;
+  border-color: var(--color-primary-variant);
+}
+
+form{
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+input{
+  width: 100%;
+  padding: 1rem;
+  border-radius:00.5rem;
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary-variant);
+  color: var(--color-white);
+}
+
+.weatherapp{
+  position: relative;
+}
+
+.clear{
+  position: absolute;
+  top: 0;
+  right:    0;
+  /* bottom:   0; */
+  margin-top: 2rem;
+  margin-right: 0.5rem;
+}
+
+.location{
+  justify-content: center;
+display: flex;
+flex-direction: row;
+}
+
+.location__icon{
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.weather__forecast{
+  text-align: left;
+}
+.weather__forecast__details{
+  margin: 2rem 0;
+}
+.horizontal-line {
+  color: var(--color-primary);
+  margin: 0.3rem 0;
+  border-top: 0.2rem solid ;
+}
+.weather__forecast__future{
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.weather__forecast__future__temp{
+  position: absolute;
+  right:    0;
+  bottom:   0;
+}
