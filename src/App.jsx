@@ -1,23 +1,77 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import './app.css';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import axios from 'axios';
 function App() {
+  const citiesToken = process.env.REACT_APP_CITIES_NAMES_API_KEY;
+  const weatherToken = process.env.REACT_APP_WEATHER_DETAILS_API_KEY;
   const [show, setShow] = useState(false);
   const [city, setCity] = useState([]);
-  const [query, setQuery] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [weatherResponseData, setWeatherResponseData] = useState('');
 
-  useEffect(() => {
+  function citySelect(e) {
+    setSelectedCity('');
+    setCity([]);
     axios
       .get(
-        `http://dataservice.accuweather.com/locations/v1/topcities/150?apikey=cSPKvptssiz1W3Mo6PQg9msgJpaX4v9S`
+        `https://api.openweathermap.org/data/2.5/weather?q=${e.target.innerText}&appid=${weatherToken}`
       )
       .then((res) => {
         const data = res.data;
-        const city = data.map((x) => x.LocalizedName);
-        setCity(city);
+        setWeatherResponseData(data);
       });
-  });
+    setShow(true);
+  }
+
+  function clearButton() {
+    setSelectedCity('');
+    setShow(false);
+  }
+
+  async function citiesResponseData(e) {
+    try {
+      if (e.target.value.length === 0) {
+        setCity([]);
+        // alert('Enter city name');
+        return;
+      }
+      const response = await axios.get(
+        `http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=${citiesToken}&q=${e.target.value}`
+      );
+      const data = response.data;
+      const cityNames = data.map((city) => city.LocalizedName);
+      setCity(cityNames);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  function trailingDebounce(func, delay) {
+    let timeoutId;
+    let context = this;
+    return function (...args) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(() => {
+        // timeoutId = null;
+        func.apply(context, args);
+      }, delay);
+    };
+  }
+
+  // eslint-disable-next-line
+  const optimisedAutoComplete = useCallback(
+    trailingDebounce(citiesResponseData, 400),
+    []
+  );
+
+  function autoComplete(e) {
+    setSelectedCity(e.target.value);
+    optimisedAutoComplete(e);
+  }
+
   return (
     <React.Fragment>
       <section id=''>
@@ -26,37 +80,40 @@ function App() {
             <h3>Weather Application</h3>
             <button
               type='button'
-              onClick={() => setShow(false)}
+              onClick={clearButton}
               className='btn btn-primary clear'
             >
               Clear
             </button>
-            <form action=''>
+            <div className='dropdown'>
               <input
-                type='search'
+                className={city.length > 0 ? 'input-border' : undefined}
+                value={selectedCity}
+                type='text'
                 name='search'
                 placeholder='Enter your city name'
                 required
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={autoComplete}
               />
-              <div>
-                {city.map((x) => {
-                  <h5>{x}</h5>;
+              <div
+                className={
+                  city.length === 0 ? 'display-none' : 'dropdown-content'
+                }
+              >
+                {city.map((city, index) => {
+                  return (
+                    <li key={index} onClick={citySelect}>
+                      <small>{city}</small>
+                    </li>
+                  );
                 })}
               </div>
-              <button
-                type='submit'
-                onClick={() => setShow(true)}
-                className='btn btn-primary'
-              >
-                Submit
-              </button>
-            </form>
+            </div>
             {show && (
               <div className='card'>
                 <div className='location'>
                   <HiOutlineLocationMarker className='location__icon' />
-                  <h4>Mumbai</h4>
+                  <h4>{weatherResponseData.name}</h4>
                 </div>
 
                 <h1>

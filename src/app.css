@@ -34,7 +34,7 @@ form{
   gap: 1rem;
 }
 
-input{
+input {
   width: 100%;
   padding: 1rem;
   border-radius:00.5rem;
@@ -88,4 +88,40 @@ flex-direction: row;
   position: absolute;
   right:    0;
   bottom:   0;
+}
+
+.dropdown {
+  overflow-y: auto;
+}
+
+.input-border{
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.dropdown-content{
+  border-bottom-right-radius: 00.5rem;
+  border-bottom-left-radius: 00.5rem;
+  width: 100%;
+  padding: 1rem;
+  padding-top: 0;
+  /* border-radius:00.5rem; */
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary-variant);
+  color: var(--color-white);
+}
+
+.dropdown-content li{
+  list-style: none;
+  /* padding: 1rem 1rem; */
+  width: 100%;
+  cursor: default;
+}
+
+.dropdown-content li:hover{
+  background: var(--color-light);
+}
+
+.display-none{
+  display: none;
 }
