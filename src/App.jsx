@@ -2,6 +2,8 @@ import React, { useState, useCallback } from 'react';
 import './app.css';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import axios from 'axios';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 function App() {
   const citiesToken = process.env.REACT_APP_CITIES_NAMES_API_KEY;
   const weatherToken = process.env.REACT_APP_WEATHER_DETAILS_API_KEY;
@@ -9,6 +11,33 @@ function App() {
   const [city, setCity] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
   const [weatherResponseData, setWeatherResponseData] = useState('');
+
+  var temp = Math.round(weatherResponseData.main.temp - 273.15);
+  var daylist = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday ',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+  var currentdate = new Date();
+  var datetime =
+    daylist[currentdate.getDay()] +
+    ' | ' +
+    currentdate.getDate() +
+    '-' +
+    (currentdate.getMonth() + 1) +
+    '-' +
+    currentdate.getFullYear() +
+    ' | ' +
+    currentdate.getHours() +
+    ':' +
+    currentdate.getMinutes() +
+    ':' +
+    currentdate.getSeconds();
+  var nextDay = currentdate.getDay() + 1;
 
   function citySelect(e) {
     setSelectedCity('');
@@ -33,7 +62,6 @@ function App() {
     try {
       if (e.target.value.length === 0) {
         setCity([]);
-        // alert('Enter city name');
         return;
       }
       const response = await axios.get(
@@ -68,10 +96,10 @@ function App() {
   );
 
   function autoComplete(e) {
+    setShow(false);
     setSelectedCity(e.target.value);
     optimisedAutoComplete(e);
   }
-
   return (
     <React.Fragment>
       <section id=''>
@@ -109,43 +137,60 @@ function App() {
                 })}
               </div>
             </div>
-            {show && (
-              <div className='card'>
-                <div className='location'>
-                  <HiOutlineLocationMarker className='location__icon' />
-                  <h4>{weatherResponseData.name}</h4>
-                </div>
+            {show &&
+              (weatherResponseData ? (
+                <div className='card'>
+                  <div className='location'>
+                    <HiOutlineLocationMarker className='location__icon' />
+                    <h4>{weatherResponseData.name}</h4>
+                  </div>
 
-                <h1>
-                  33<span>&#176;</span>
-                  <small>C</small>
-                </h1>
-                <h5>Sunny</h5>
-                <h5>Monday | 19-08-22 | 12:53</h5>
-                <div className='weather__forecast'>
-                  <div className='weather__forecast__details'>
-                    <h4>Percipitation: 10%</h4>
-                    <h4>Humidity: 60%</h4>
-                    <h4>Wind: 23km/h</h4>
-                  </div>
-                  <div className='weather__forecast__future'>
-                    <h5>Tuesday</h5>
-                    <div className='weather__forecast__future__temp'>
-                      33<span>&#176;</span>
-                      <small>C</small>
+                  <h1>
+                    {temp}
+                    <span>&#176;</span>
+                    <small>C</small>
+                  </h1>
+                  <h5>{weatherResponseData.weather[0].main}</h5>
+                  <h5>{datetime}</h5>
+                  <div className='weather__forecast'>
+                    <div className='weather__forecast__details'>
+                      <h4>Pressure: {weatherResponseData.main.pressure}mbar</h4>
+                      <h4>Humidity: {weatherResponseData.main.humidity}%</h4>
+                      <h4>Wind: {weatherResponseData.wind.speed}km/h</h4>
                     </div>
-                  </div>
-                  <hr className='horizontal-line' />
-                  <div className='weather__forecast__future'>
-                    <h5>Wednesday</h5>
-                    <div className='weather__forecast__future__temp'>
-                      33<span>&#176;</span>
-                      <small>C</small>
+                    <div className='weather__forecast__future'>
+                      <h5>
+                        {nextDay > 6
+                          ? daylist[(nextDay % 6) - 1]
+                          : daylist[nextDay]}
+                      </h5>
+                      <div className='weather__forecast__future__temp'>
+                        {temp + 2}
+                        <span>&#176;</span>
+                        <small>C</small>
+                      </div>
+                    </div>
+                    <hr className='horizontal-line' />
+                    <div className='weather__forecast__future'>
+                      <h5>
+                        {nextDay > 6
+                          ? daylist[nextDay % 6]
+                          : daylist[nextDay + 1]}
+                      </h5>
+                      <div className='weather__forecast__future__temp'>
+                        {temp + 1}
+                        <span>&#176;</span>
+                        <small>C</small>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                // 'Loading...'
+                <Box sx={{ display: 'flex' }}>
+                  <CircularProgress />
+                </Box>
+              ))}
           </div>
         </div>
       </section>
